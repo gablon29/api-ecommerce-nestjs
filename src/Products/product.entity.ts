@@ -13,6 +13,8 @@ export class Product {
   stock: number;
   @Column('text')
   imgUrl: string;
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
   @ManyToOne(() => Category, (category) => category.products)
   category_id: Category;
   @Column()
