@@ -3,6 +3,7 @@ import { UserModule } from './User/user.module';
 import { ProductsModule } from './Products/products.module';
 import { AuthModule } from './Auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     ProductsModule,
     AuthModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
