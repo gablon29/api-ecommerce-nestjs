@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 export class Category {
   @PrimaryGeneratedColumn()
   id: string;
-  @Column({ length: 50 })
+  @Column({ length: 50, name: 'category_name' })
   name: string;
   @OneToMany(() => Product, (product) => product.category_id)
   products: Product[];

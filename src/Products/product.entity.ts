@@ -7,13 +7,13 @@ export class Product {
   id: string;
   @Column({ length: 50 })
   name: string;
-  @Column('text')
+  @Column('text', { nullable: false })
   description: string;
-  @Column('number')
+  @Column('int', { default: 0 })
   stock: number;
   @Column('text')
   imgUrl: string;
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, nullable: false })
   price: number;
   @ManyToOne(() => Category, (category) => category.products)
   category_id: Category;
