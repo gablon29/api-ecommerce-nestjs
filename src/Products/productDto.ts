@@ -23,7 +23,7 @@ export class ProductDto {
   @IsDecimal()
   price: number;
   @IsNotEmpty()
-  category_id: Category;
+  category_id: number;
   @IsString()
   orderDetails: string;
 }
