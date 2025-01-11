@@ -1,25 +1,20 @@
-import {
-  IsAlpha,
-  IsEmail,
-  IsPhoneNumber,
-  IsStrongPassword,
-  Length,
-} from 'class-validator';
+import { IsAlpha, IsStrongPassword, Length } from 'class-validator';
 
 export class UserDto {
   @Length(3, 10)
   @IsAlpha()
   name: string;
-  @IsAlpha()
-  @Length(3, 10)
-  lastName: string;
-  @Length(3, 10)
+
+  @Length(3, 10, {
+    message: 'El nombre de usuario debe tener entre 3 y 10 caracteres',
+  })
   username: string;
-  @IsEmail()
-  email: string;
-  @IsStrongPassword()
-  @Length(8, 20)
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  })
   password: string;
-  @IsPhoneNumber()
-  phone: string;
 }

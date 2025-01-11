@@ -7,10 +7,11 @@ import {
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserCreateMiddleware } from './middleware/userCreate.middleware';
-import path from 'path';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from './user.entity';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([Users])],
   controllers: [UserController],
   providers: [UserService],
 })

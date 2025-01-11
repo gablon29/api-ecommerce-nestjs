@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Users } from './user.entity';
+import * as bcry from 'bcrypt';
 import { UserDto } from './userDto';
 
 @Injectable()
 export class UserService {
-  getAllUser(): string {
-    return 'Get all users!';
-  }
+  constructor(
+    @InjectRepository(Users) private userRepository: Repository<Users>,
+  ) {}
 
-  getUserById(userId: string): string {
-    return `Get user with id ${userId}`;
-  }
-  createUser(user: UserDto): string {
-    return `User created with name: ${user.name}`;
-  }
-  updateUser(userId: string, user: any): string {
-    return `User with id ${userId} updated with name: ${user.name}`;
-  }
-  deleteUser(userId: string): string {
-    return `User with id ${userId} deleted`;
+  async createUser(user: UserDto): Promise<Users> {
+    const salt = await bcry.genSalt(10);
+    const hashPassword = await bcry.hash(user.password, salt);
+    const newUser = this.userRepository.create({
+      ...user,
+      password: hashPassword,
+    });
+    return await this.userRepository.save(newUser);
   }
 }
