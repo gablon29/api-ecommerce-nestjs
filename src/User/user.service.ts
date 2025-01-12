@@ -20,4 +20,14 @@ export class UserService {
     });
     return await this.userRepository.save(newUser);
   }
+
+  async findAll(): Promise<Users[]> {
+    return this.userRepository.find();
+  }
+
+  async findOne(id: string): Promise<Users> {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
 }
