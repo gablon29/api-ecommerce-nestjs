@@ -1,33 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Users } from './user.entity';
 import * as bcry from 'bcrypt';
 import { UserDto } from './userDto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
+    private dataSource: DataSource,
+    @Inject(ConfigService) private configService: ConfigService,
   ) {}
 
-  async createUser(user: UserDto): Promise<Users> {
-    const salt = await bcry.genSalt(10);
-    const hashPassword = await bcry.hash(user.password, salt);
-    const newUser = this.userRepository.create({
-      ...user,
-      password: hashPassword,
-    });
-    return await this.userRepository.save(newUser);
+  async createUser(user: Omit<UserDto, 'id'>): Promise<Users> {
+    const saltRound = this.configService.get<number>('PARSE_SALT_ROUND');
+    try {
+      return this.dataSource.transaction(async (manager: EntityManager) => {
+        const userExists = await this.userRepository.findOne({
+          where: { username: user.username },
+        });
+        if (userExists) {
+          throw new Error('User already exists');
+        } else {
+          const salt = await bcry.genSalt(saltRound);
+          const hashedPassword = await bcry.hash(user.password, salt);
+          const newUser = this.userRepository.create({
+            name: user.name,
+            username: user.username,
+            password: hashedPassword,
+          });
+          return manager.save(newUser);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        {
+          status: 400,
+          error: 'User already exists',
+        },
+        400,
+      );
+    }
   }
 
-  async findAll(): Promise<Users[]> {
-    return this.userRepository.find();
-  }
-
-  async findOne(id: string): Promise<Users> {
+  async findOneById(id: string): Promise<Users> {
     return this.userRepository.findOne({
       where: { id },
+    });
+  }
+
+  async findOneByUsername(username: string): Promise<Users> {
+    return this.userRepository.findOne({
+      where: { username },
     });
   }
 }
