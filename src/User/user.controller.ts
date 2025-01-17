@@ -2,8 +2,7 @@ import {
   Body,
   Controller,
   Get,
-  Param,
-  ParseUUIDPipe,
+  NotFoundException,
   Post,
   Query,
 } from '@nestjs/common';
@@ -20,8 +19,12 @@ export class UserController {
     return this.userService.createUser(body);
   }
 
-  @Get(':id')
-  async getUserByName(@Param('id', ParseUUIDPipe) id: string): Promise<Users> {
-    return this.userService.findOneById(id);
+  @Get()
+  async getUserByName(@Query('name') name: string): Promise<Users> {
+    const userFind = await this.userService.findOneById(name);
+    if (!userFind) {
+      throw new NotFoundException('User not found');
+    }
+    return userFind;
   }
 }

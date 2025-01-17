@@ -22,7 +22,13 @@ export class UserService {
           where: { username: user.username },
         });
         if (userExists) {
-          throw new Error('User already exists');
+          throw new HttpException(
+            {
+              status: 400,
+              error: 'El usuario ya existe',
+            },
+            400,
+          );
         } else {
           const salt = await bcry.genSalt(saltRound);
           const hashedPassword = await bcry.hash(user.password, salt);
@@ -39,7 +45,7 @@ export class UserService {
       throw new HttpException(
         {
           status: 400,
-          error: 'User already exists',
+          error: 'Error en la operacion',
         },
         400,
       );
