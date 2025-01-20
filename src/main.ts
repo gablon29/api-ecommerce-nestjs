@@ -16,6 +16,7 @@ async function bootstrap() {
       transform: true,
       exceptionFactory: (errors) => {
         const cleanErrors = errors.map((error) => {
+          // mapeamos los errores para que solo devuelva la propiedad y los constraints
           return {
             property: error.property,
             constraints: error.constraints,

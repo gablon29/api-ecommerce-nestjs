@@ -5,28 +5,18 @@ import { AuthModule } from './Auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from './Products/product.entity';
-import { Category } from './category/category.entity';
-import { Users } from './User/user.entity';
+import typeOrmConfig from './config/typeOrm';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env.development.local',
       isGlobal: true,
+      load: [typeOrmConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USER'),
-        password: configService.get('DB_PASS'),
-        database: configService.get('DB_NAME'),
-        entities: [Product, Category, Users],
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) =>
+        configService.get('typeorm'),
     }),
     UserModule,
     ProductsModule,
