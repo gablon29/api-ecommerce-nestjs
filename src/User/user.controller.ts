@@ -2,29 +2,43 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
+  HttpException,
+  HttpStatus,
   Post,
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './userDto';
 import { Users } from './user.entity';
+import { ApiResponse } from 'src/response/ApiResponse';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  createUser(@Body() body: UserDto): Promise<Users> {
-    return this.userService.createUser(body);
+  public async createUser(@Body() body: UserDto): Promise<ApiResponse<Users>> {
+    try {
+      const user = await this.userService.createUser(body);
+      return new ApiResponse<Users>(
+        HttpStatus.CREATED,
+        true,
+        'User created',
+        user,
+      );
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get()
-  async getUserByName(@Query('name') name: string): Promise<Users> {
+  public async getUserByName(
+    @Query('name') name: string,
+  ): Promise<ApiResponse<Users>> {
     const userFind = await this.userService.findOneById(name);
     if (!userFind) {
-      throw new NotFoundException('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    return userFind;
+    return new ApiResponse<Users>(HttpStatus.OK, true, 'User found', userFind);
   }
 }

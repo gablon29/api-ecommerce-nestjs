@@ -1,12 +1,11 @@
 import {
   ConflictException,
-  HttpException,
   Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Users } from './user.entity';
 import * as bcry from 'bcrypt';
 import { UserDto } from './userDto';
@@ -16,11 +15,10 @@ import { ConfigService } from '@nestjs/config';
 export class UserService {
   constructor(
     @InjectRepository(Users) private readonly userRepository: Repository<Users>,
-    private dataSource: DataSource,
     @Inject(ConfigService) private configService: ConfigService,
   ) {}
 
-  async createUser(user: Omit<UserDto, 'id'>): Promise<Users> {
+  public async createUser(user: UserDto): Promise<Users> {
     const saltRound = this.configService.get<number>('PARSE_SALT_ROUND', 10);
     // verify if user exist
     const userExist = await this.userRepository.findOne({
@@ -43,13 +41,13 @@ export class UserService {
     }
   }
 
-  async findOneById(id: string): Promise<Users> {
+  public async findOneById(id: string): Promise<Users> {
     return this.userRepository.findOne({
       where: { id },
     });
   }
 
-  async findOneByUsername(username: string): Promise<Users> {
+  public async findOneByUsername(username: string): Promise<Users> {
     return this.userRepository.findOne({
       where: { username },
     });
