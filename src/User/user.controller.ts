@@ -13,10 +13,15 @@ import { UserService } from './user.service';
 import { UserDto } from './userDto';
 import { Users } from './user.entity';
 import { ApiResponse } from 'src/response/ApiResponse';
+import { AuthDto } from 'src/Auth/auth.dto';
+import { AuthService } from 'src/Auth/auth.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post()
   public async createUser(@Body() body: UserDto): Promise<ApiResponse<Users>> {
@@ -56,6 +61,21 @@ export class UserController {
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get('login')
+  public async login(@Body() body: AuthDto): Promise<ApiResponse<string>> {
+    try {
+      const user = await this.authService.generateToken(body);
+      return new ApiResponse<string>(
+        HttpStatus.OK,
+        true,
+        'User logged in',
+        user,
+      );
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
   }
 

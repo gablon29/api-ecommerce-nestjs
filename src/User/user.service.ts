@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from './user.entity';
-import * as bcry from 'bcrypt';
+import * as bcry from 'bcryptjs';
 import { UserDto } from './userDto';
 import { ConfigService } from '@nestjs/config';
 import { IUserService } from './IUser.service';
@@ -51,7 +51,7 @@ export class UserService implements IUserService {
       throw new ConflictException('User already exist');
     }
     // if not exist, create user.
-    const hashedPassword = await bcry.hash(user.password, saltRound);
+    const hashedPassword = await bcry.hash(user.password, 10);
     const newUser = this.userRepository.create({
       ...user,
       password: hashedPassword,

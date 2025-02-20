@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import typeOrmConfig from './config/typeOrm';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,9 +19,13 @@ import typeOrmConfig from './config/typeOrm';
       useFactory: (configService: ConfigService) =>
         configService.get('typeorm'),
     }),
+    JwtModule.register({
+      global: true,
+      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET,
+    }),
     UserModule,
     ProductsModule,
-    AuthModule,
     CategoryModule,
   ],
   controllers: [],
