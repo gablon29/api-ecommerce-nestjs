@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './userDto';
@@ -15,6 +16,7 @@ import { Users } from './user.entity';
 import { ApiResponse } from 'src/response/ApiResponse';
 import { AuthDto } from 'src/Auth/auth.dto';
 import { AuthService } from 'src/Auth/auth.service';
+import { AuthTokenGuard } from 'src/Auth/authToken.guard';
 
 @Controller('user')
 export class UserController {
@@ -50,6 +52,7 @@ export class UserController {
   }
 
   @Get('all')
+  @UseGuards(AuthTokenGuard)
   public async getAllUsers(): Promise<ApiResponse<Users[]>> {
     try {
       const users = await this.userService.findAll();

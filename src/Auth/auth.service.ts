@@ -44,7 +44,7 @@ export class AuthService {
 
   public async verifyToken(token: string): Promise<string> {
     try {
-      const decoded = this.jwtService.verify(token, {
+      const decoded = await this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
       decoded.iat = new Date(decoded.iat * 1000);
