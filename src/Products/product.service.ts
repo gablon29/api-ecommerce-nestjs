@@ -36,4 +36,11 @@ export class ProductService {
     });
     this.productRepository.save(newProduct);
   }
+  public async deleteProduct(id: string): Promise<void> {
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    this.productRepository.delete(product);
+  }
 }
